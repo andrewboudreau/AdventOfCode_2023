@@ -2,11 +2,11 @@
 {
     public static class ReadInputs
     {
-        public static IEnumerable<int> AsInts(string source)
+        public static IEnumerable<int> AsIntegers(string source)
             => source.Select(c => (int)char.GetNumericValue(c));
 
-        public static IEnumerable<IEnumerable<int>> ReadAsRowsOfInts()
-            => Read(AsInts).Select(x => x);
+        public static IEnumerable<IEnumerable<int>> ReadAsRowsOfIntegers()
+            => Read(AsIntegers).Select(x => x);
 
         public static IEnumerable<T> Read<T>(Func<string, T> factory) =>
             Read()
