@@ -5,7 +5,7 @@
 This repository contains my personal solutions for the Advent of Code challenges, implemented in C#. As an advanced C# software engineer, I've approached these puzzles with a focus on efficient and effective programming techniques. Each folder in the repository corresponds to a specific day of the challenge, containing the C# code that I've written to solve the daily puzzles. This is not just a collection of solutions, but a reflection of my problem-solving journey and coding skills in C#. Feel free to explore my approaches and share your thoughts or alternative solutions!
 
 # Day 01
- [Read the full details](Day01/readme.md) about the day01 solution.
+ [Read the full details](Day01/readme.md) about the solution.
 ## Part Two - Numeric and Spelled-Out Digits
 ```csharp
 Read(input => input!)
@@ -21,4 +21,37 @@ Read(input => input!)
             return checksum;
         })
     .ToConsole(sum => $"Part2: {sum}");
+```
+
+
+# Day 02
+ [Read the full details](Day02/readme.md) about the solution.
+## Reading and Processing Games
+```csharp
+var games = Read(factory: Game.Factory).ToList();
+
+var checkSum = 0;
+var powerSum = 0;
+var min = (Red: 12, Green: 13, Blue: 14);
+
+foreach (var game in games)
+{
+    var (Red, Green, Blue) = game.MaxHolding();
+    // Calculating sums based on the game's characteristics
+    ...
+}
+```
+
+## Game Class and Parsing Logic
+```csharp
+class Game(int gameId)
+{
+    ...
+    public static Game Factory(string record)
+    {
+        ...
+        // Parsing logic for each game
+    }
+    ...
+}
 ```
