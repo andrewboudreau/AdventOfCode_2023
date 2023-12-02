@@ -1,8 +1,9 @@
 ﻿// https://adventofcode.com/2023/day/2
 
-var games = Read(factory: Game.Factory);
+var games = Read(factory: Game.Factory).ToList();
 
 var checkSum = 0;
+var powerSum = 0;
 var min = (Red: 12, Green: 13, Blue: 14);
 
 foreach (var game in games)
@@ -12,9 +13,15 @@ foreach (var game in games)
     {
         checkSum += game.GameId;
     }
+    var power = Red * Green * Blue;
+
+    Console.WriteLine($"Game {game.GameId}: power={power} max=({Red}, {Green}, {Blue})");
+    powerSum += power;
 }
 
 Console.WriteLine($"Check sum: {checkSum}");
+Console.WriteLine($"Power sum: {powerSum}");
+
 
 class Game(int gameId)
 {
