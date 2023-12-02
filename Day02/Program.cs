@@ -1,25 +1,6 @@
 ﻿// https://adventofcode.com/2023/day/2
 
-var games = Read(record =>
-{
-    var parts = record.Split(':');
-    var gameId = int.Parse(parts[0].Split(' ')[1]);
-
-    var game = new Game(gameId);
-
-    var sets = parts[1].Split(';');
-    foreach (var set in sets)
-    {
-        game.AddSet();
-        foreach (var blocks in set.Split(','))
-        {
-            var block = blocks.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            game.AddGrab(int.Parse(block[0]), (Colors)Enum.Parse(typeof(Colors), block[1]));
-        }
-    }
-
-    return game;
-});
+var games = Read(factory: Game.GameFactory);
 
 games.ToConsole(x => string.Join("\r\n", x));
 
@@ -43,5 +24,28 @@ class Game(int gameId)
             sets += string.Join(' ', set.Select(x => $"{x.Number} {x.color}")) + "; ";
         }
         return $"Game {GameId}: {sets}";
+    }
+
+    public static Game GameFactory(string record)
+    {
+        var parts = record.Split(':');
+        var gameId = int.Parse(parts[0].Split(' ')[1]);
+
+        var game = new Game(gameId);
+
+        var sets = parts[1].Split(';');
+        foreach (var set in sets)
+        {
+            game.AddSet();
+            foreach (var blocks in set.Split(','))
+            {
+                var block = blocks.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                game.AddGrab(
+                    number: int.Parse(block[0]), 
+                    color: (Colors)Enum.Parse(typeof(Colors), block[1]));
+            }
+        }
+
+        return game;
     }
 }
