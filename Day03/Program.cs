@@ -1,4 +1,5 @@
-﻿
+﻿// https://adventofcode.com/2023/day/3
+
 var grid = new Grid<char>(Read()!);
 
 List<Node<char>> symbols = [];
