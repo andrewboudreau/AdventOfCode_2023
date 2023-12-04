@@ -55,3 +55,44 @@ class Game(int gameId)
     ...
 }
 ```
+
+# Day 03
+ [Read the full details](Day03/readme.md) about the solution.
+ First usage of the Grid class as seen
+ ```csharp
+var grid = new Grid<char>(Read());
+
+...
+// Parse parts numbers and symbols
+grid.Each(cell =>
+{
+    if (char.IsDigit(cell))
+    {
+        builder.Enqueue(cell);
+    }
+    else
+    {
+        AddPartNumber(builder);
+        if (cell != '.')
+        {
+            symbols.Add(cell);
+        }
+    }
+});
+```
+
+Relationship Analysis and Calculations
+```csharp
+
+// find gears adjacent to two exactly part numbers
+class PartNumber
+{
+    ...
+    public bool IsAdjacentTo(Node<char> symbol, Grid<char> grid)
+    {
+        var neighbors = grid.Neighbors(symbol);
+        return PartDigits.Any(digit => neighbors.Contains(digit));
+    }
+    ...
+}
+```

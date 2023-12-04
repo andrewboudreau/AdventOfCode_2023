@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Immutable;
 
+namespace Day00;
+
 public class Grid<T> : IEnumerable<Node<T>>
 {
     private readonly List<Node<T>> nodes;
@@ -50,44 +52,44 @@ public class Grid<T> : IEnumerable<Node<T>>
 
     public int Width => width;
 
-    public IEnumerable<Node<T>> Neighbors(Node<T> position, bool withDiagonals = true)
+    public IEnumerable<Node<T>> Neighbors(Node<T> of, bool withDiagonals = true)
     {
-        if (withDiagonals && this[position.X + 1, position.Y - 1] is Node<T> downRight)
+        if (withDiagonals && this[of.X + 1, of.Y - 1] is Node<T> downRight)
         {
             yield return downRight;
         }
 
-        if (this[position.X + 1, position.Y] is Node<T> right)
+        if (this[of.X + 1, of.Y] is Node<T> right)
         {
             yield return right;
         }
 
-        if (this[position.X, position.Y - 1] is Node<T> down)
+        if (this[of.X, of.Y - 1] is Node<T> down)
         {
             yield return down;
         }
 
-        if (withDiagonals && this[position.X - 1, position.Y - 1] is Node<T> downLeft)
+        if (withDiagonals && this[of.X - 1, of.Y - 1] is Node<T> downLeft)
         {
             yield return downLeft;
         }
 
-        if (this[position.X - 1, position.Y] is Node<T> left)
+        if (this[of.X - 1, of.Y] is Node<T> left)
         {
             yield return left;
         }
 
-        if (withDiagonals && this[position.X - 1, position.Y + 1] is Node<T> upLeft)
+        if (withDiagonals && this[of.X - 1, of.Y + 1] is Node<T> upLeft)
         {
             yield return upLeft;
         }
 
-        if (this[position.X, position.Y + 1] is Node<T> up)
+        if (this[of.X, of.Y + 1] is Node<T> up)
         {
-            yield return up; ;
+            yield return up;
         }
 
-        if (withDiagonals && this[position.X + 1, position.Y + 1] is Node<T> upRight)
+        if (withDiagonals && this[of.X + 1, of.Y + 1] is Node<T> upRight)
         {
             yield return upRight;
         }
