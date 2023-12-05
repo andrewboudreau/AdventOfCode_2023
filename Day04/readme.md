@@ -16,13 +16,13 @@ The solution involves creating scratch cards from input data, calculating a tota
 
 ## Example Usages
 
-Reading Scratch Cards and Calculating Score
+### Reading Scratch Cards and Calculating Score
 ```csharp
 var cards = Read(factory: line => new ScratchCard(line));
 Console.WriteLine($"Part 1: Total score is {cards.Sum(x => x.Score)}.");
 ```
 
-Game Simulation Logic
+### Game Simulation Logic
 ```csharp
 var games = cards.Select(card => new Game(card)).ToList();
 ...
@@ -34,7 +34,7 @@ do
 Console.WriteLine($"There are {games.Sum(g => g.Played)} total cards.");
 ```
 
-ScratchCard and Game Classes
+### ScratchCard and Game Classes
 ```csharp
 class Game(ScratchCard card)
 {

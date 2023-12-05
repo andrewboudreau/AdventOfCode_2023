@@ -96,3 +96,63 @@ class PartNumber
     ...
 }
 ```
+
+# Day 04
+ [Read the full details](Day04/readme.md) about the solution.
+Do while loops and parsing logic.
+```csharp
+do
+{
+    while (games[index].Unplayed > 0)
+    {
+        var winnings = games[index].Play();
+        for (var n = 1; n < games.Count && n <= winnings; n++)
+        {
+            games[index + n].Unplayed++;
+        }
+    }
+
+    index = Math.Min(index + 1, games.Count - 1);
+
+} while (games[index].Unplayed != 0);
+
+Console.WriteLine($"There are {games.Sum(g => g.Played)} total cards.");
+```
+
+### ScratchCard and Game Classes
+```csharp
+class Game(ScratchCard card)
+{
+    public ScratchCard Card { get; private set; } = card;
+    public int Unplayed { get; set; } = 1;
+    public int Played { get; private set; }
+    public int Play()
+    {
+        Unplayed--;
+        Played++;
+        return Card.NumberOfWinningNumbers;
+    }
+}
+
+class ScratchCard
+{
+    public int NumberOfWinningNumbers => YourNumbers.Intersect(WinningNumbers).Count();
+
+    public int Score
+    {
+        get
+        {
+            if (NumberOfWinningNumbers == 0) return 0;
+
+            var wins = NumberOfWinningNumbers;
+            int value = 1;
+            while (--wins > 0)
+            {
+                value *= 2;
+            }
+
+            return value;
+        }
+    }
+}
+```
