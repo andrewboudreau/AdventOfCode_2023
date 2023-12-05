@@ -1,7 +1,8 @@
 ﻿# Problem Overview - Day 3
 
 ## Description
-The challenge for Day 3 appears to involve processing a grid of characters, identifying part numbers, symbols, and their relationships. The exact details of the problem statement are not provided, so the overview will be based on the provided solution.
+The challenge for Day 3 appears to involve processing a grid of characters, identifying part numbers, symbols, 
+and their relationships.
 
 # Key Tasks
  - Parse part numbers and symbols from a grid.

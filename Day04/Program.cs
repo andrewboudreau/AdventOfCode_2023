@@ -5,7 +5,38 @@ Console.WriteLine("Day4");
 var cards = Read(factory: line => new ScratchCard(line));
 Console.WriteLine($"Part 1: Total score is {cards.Sum(x => x.Score)}.");
 
+var games = cards.Select(card => new Game(card)).ToList();
 
+var index = 0;
+do
+{
+    while (games[index].Unplayed > 0)
+    {
+        var winnings = games[index].Play();
+        for (var n = 1; n < games.Count && n <= winnings; n++)
+        {
+            games[index + n].Unplayed++;
+        }
+    }
+
+    index = Math.Min(index + 1, games.Count - 1);
+
+} while (games[index].Unplayed != 0);
+
+Console.WriteLine($"There are {games.Sum(g => g.Played)} total cards.");
+
+class Game(ScratchCard card)
+{
+    public ScratchCard Card { get; private set; } = card;
+    public int Unplayed { get; set; } = 1;
+    public int Played { get; private set; }
+    public int Play()
+    {
+        Unplayed--;
+        Played++;
+        return Card.NumberOfWinningNumbers;
+    }
+}
 
 class ScratchCard
 {
@@ -25,7 +56,7 @@ class ScratchCard
 
     public List<int> WinningNumbers { get; }
 
-    public int NumberOfWinningNumbers 
+    public int NumberOfWinningNumbers
         => YourNumbers.Intersect(WinningNumbers).Count();
 
     public int Score
