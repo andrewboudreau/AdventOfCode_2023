@@ -25,10 +25,10 @@ public static class StringParseExtensions
     /// <param name="skipUntil">Starts parsing integers after the first instance of this char.</param>
     /// <param name="thenSplitOn">what to split the string upon, defaults to ',' a comma.</param>
     /// <returns>The set of parse-able integer in the source.</returns>
-    public static IEnumerable<int> ParseInts(string source, char skipUntil = ':', char thenSplitOn = ',')
+    public static IEnumerable<int> ParseIntegers(string source, char skipUntil = ':', char thenSplitOn = ',')
     {
         return new string(source.SkipWhile(x => x != skipUntil).Skip(2).ToArray())
-            .Split(thenSplitOn, StringSplitOptions.TrimEntries)
+            .Split(thenSplitOn, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
             .Select(x => int.Parse(x));
     }
 
