@@ -7,13 +7,13 @@ class Almanac
 {
     private readonly int[] seeds;
     private readonly List<Map> maps;
-    private List<int> ranges;
+    private readonly List<int> ranges;
 
     public Almanac(string seeds)
     {
         this.seeds = ParseIntegers(seeds, skipUntil: ':', thenSplitOn: ' ').ToArray();
-        this.maps = [];
-        this.ranges = [];
+        maps = [];
+        ranges = [];
     }
 
     private void StartMap(string source, string destination)
