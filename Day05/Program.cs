@@ -1,5 +1,8 @@
 ﻿// https://adventofcode.com/2023/day/5
 
+using System.ComponentModel;
+using System.IO.Compression;
+
 var almanac = ReadTo(Almanac.Create);
 Console.WriteLine(almanac);
 
@@ -15,12 +18,6 @@ class Almanac
         maps = [];
         ranges = [];
     }
-
-    private void StartMap(string source, string destination)
-        => maps.Add(new Map(source, destination));
-
-    private void AddRange(IEnumerable<int> ranges)
-        => this.ranges.AddRange(ranges);
 
     public static Almanac Create(IEnumerable<string?> data)
     {
@@ -41,12 +38,22 @@ class Almanac
             }
             else if (iter.Current.Split(' ').Length != 0)
             {
-                almanac.AddRange(iter.Current.Split(' ').Select(int.Parse));
+                (int dest, int src, int length) = iter.Current.Split(' ').Select(int.Parse).ToArray();
+                almanac.AddRange(dest, src, length);
             }
         }
 
         return almanac;
     }
+
+    private void StartMap(string source, string destination)
+        => maps.Add(new Map(source, destination));
+
+    private void AddRange(int dest, int src, int length)
+    {
+        maps[^1].Ranges.Add(new Range(dest, src, length));
+    }
+
 
     public class Map(string source, string destination)
     {
@@ -54,6 +61,46 @@ class Almanac
 
         public string Destination { get; private set; } = destination;
 
-        public List<int> Ranges { get; private set; } = new();
+        public List<Range> Ranges { get; private set; } = new();
+
+        public int MapToDestination(int source)
+        {
+            foreach (var range in Ranges)
+            {
+                if (range.MapToDestination(source, out var destination))
+                {
+                    return destination;
+                }
+            }
+
+            return 0;
+        }
+    }
+
+    public class Range()
+    {
+        public Range(int dest, int src, int length)
+            : this()
+        {
+            SourceStart = src;
+            DestinationStart = dest;
+            Length = length;
+        }
+
+        public int SourceStart { get; set; }
+        public int DestinationStart { get; set; }
+        public int Length { get; set; }
+
+        public bool MapToDestination(int source, out int destination)
+        {
+            destination = 0;
+            if (source < SourceStart || source > SourceStart + Length)
+            {
+                return false;
+            }
+
+            destination = (SourceStart - source) + DestinationStart;
+            return true;
+        }
     }
 }
