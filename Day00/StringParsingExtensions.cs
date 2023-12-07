@@ -1,4 +1,6 @@
-﻿namespace Day00;
+﻿using System.Numerics;
+
+namespace Day00;
 
 public static class StringParseExtensions
 {
@@ -30,6 +32,20 @@ public static class StringParseExtensions
         return new string(source.SkipWhile(x => x != skipUntil).Skip(2).ToArray())
             .Split(thenSplitOn, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
             .Select(x => int.Parse(x));
+    }
+
+    /// <summary>
+    /// Find the first long in a string.
+    /// </summary>
+    /// <param name="source">the string to parse, should contain an long sounded by the split char.</param>
+    /// <param name="skipUntil">Starts parsing longs after the first instance of this char.</param>
+    /// <param name="thenSplitOn">what to split the string upon, defaults to ',' a comma.</param>
+    /// <returns>The set of parse-able long in the source.</returns>
+    public static IEnumerable<long> ParseLongs(string source, char skipUntil = ':', char thenSplitOn = ',')
+    {
+        return new string(source.SkipWhile(x => x != skipUntil).Skip(2).ToArray())
+            .Split(thenSplitOn, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
+            .Select(x => long.Parse(x));
     }
 
     /// <summary>

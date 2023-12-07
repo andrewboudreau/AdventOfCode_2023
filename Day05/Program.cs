@@ -1,30 +1,57 @@
 ﻿// https://adventofcode.com/2023/day/5
 
-using System.ComponentModel;
-using System.IO.Compression;
-
-var almanac = ReadTo(Almanac.Create);
+var almanac = ReadTo(Almanac<long>.Parse);
 Console.WriteLine(almanac);
 
-class Almanac
-{
-    private readonly int[] seeds;
-    private readonly List<Map> maps;
-    private readonly List<int> ranges;
+var locations = new List<long>();
 
-    public Almanac(string seeds)
+foreach (var seed in almanac.seeds)
+{
+    Console.WriteLine("Starting Seed " + seed);
+    var dest = almanac.MapToDestination(seed);
+    locations.Add(dest);
+    Console.WriteLine($"mapping seed {seed} to location {dest}");
+    Console.WriteLine("");
+
+    Console.WriteLine("Min location is " + locations.Min());
+}
+
+class Almanac<TNumber>(TNumber[] seeds)
+    where TNumber : struct, INumber<TNumber>
+{
+    public TNumber[] seeds = seeds;
+
+    private readonly List<Almanac<TNumber>.Map> maps = [];
+
+    public TNumber MapToDestination(TNumber source)
     {
-        this.seeds = ParseIntegers(seeds, skipUntil: ':', thenSplitOn: ' ').ToArray();
-        maps = [];
-        ranges = [];
+        TNumber dest = default;
+        foreach (var map in maps)
+        {
+            dest = map.MapToDestination(source);
+            source = dest;
+        }
+
+        return dest;
     }
 
-    public static Almanac Create(IEnumerable<string?> data)
+    public static Almanac<TNumber> Parse(IEnumerable<string?> data)
     {
         using var iter = data.GetEnumerator();
         iter.MoveNext();
 
-        var almanac = new Almanac(iter.Current!);
+        if (iter.Current is null)
+        {
+            throw new InvalidOperationException("no data to parse");
+        }
+
+        var seeds = iter.Current
+            .Split(':')[1]
+            .Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
+            .Select(x => TNumber.Parse(x, NumberStyles.Integer, default))
+            .ToArray();
+
+        var almanac = new Almanac<TNumber>(seeds);
         while (iter.MoveNext())
         {
             if (iter.Current is null)
@@ -36,9 +63,13 @@ class Almanac
                 var part = iter.Current.Split(' ')[0].Split('-');
                 almanac.StartMap(part[0], part[^1]);
             }
-            else if (iter.Current.Split(' ').Length != 0)
+            else if (iter.Current.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length != 0)
             {
-                (int dest, int src, int length) = iter.Current.Split(' ').Select(int.Parse).ToArray();
+                var d1 = iter.Current.Split(' ');
+                (TNumber dest, TNumber src, TNumber length) = d1
+                    .Select(x => TNumber.Parse(x, NumberStyles.Integer, default))
+                    .ToArray();
+
                 almanac.AddRange(dest, src, length);
             }
         }
@@ -49,11 +80,10 @@ class Almanac
     private void StartMap(string source, string destination)
         => maps.Add(new Map(source, destination));
 
-    private void AddRange(int dest, int src, int length)
+    private void AddRange(TNumber dest, TNumber src, TNumber length)
     {
         maps[^1].Ranges.Add(new Range(dest, src, length));
     }
-
 
     public class Map(string source, string destination)
     {
@@ -61,25 +91,26 @@ class Almanac
 
         public string Destination { get; private set; } = destination;
 
-        public List<Range> Ranges { get; private set; } = new();
+        public List<Range> Ranges { get; private set; } = [];
 
-        public int MapToDestination(int source)
+        public TNumber MapToDestination(TNumber source)
         {
             foreach (var range in Ranges)
             {
                 if (range.MapToDestination(source, out var destination))
                 {
+                    Console.WriteLine($"{Source} -> {Destination} ({source},{destination})");
                     return destination;
                 }
             }
-
-            return 0;
+            return source;
+            //throw new InvalidOperationException($"couldn't find a {Source} -> {Destination} map for source {source}");
         }
     }
 
     public class Range()
     {
-        public Range(int dest, int src, int length)
+        public Range(TNumber dest, TNumber src, TNumber length)
             : this()
         {
             SourceStart = src;
@@ -87,20 +118,35 @@ class Almanac
             Length = length;
         }
 
-        public int SourceStart { get; set; }
-        public int DestinationStart { get; set; }
-        public int Length { get; set; }
+        public TNumber SourceStart { get; }
+        public TNumber DestinationStart { get; }
+        public TNumber Length { get; }
 
-        public bool MapToDestination(int source, out int destination)
+        public bool MapToDestination(TNumber source, out TNumber destination)
         {
-            destination = 0;
-            if (source < SourceStart || source > SourceStart + Length)
+            destination = default;
+            if (source >= SourceStart && source < SourceStart + Length)
             {
-                return false;
+                destination = TNumber.Abs(SourceStart - source) + DestinationStart;
+                return true;
             }
 
-            destination = (SourceStart - source) + DestinationStart;
-            return true;
+            return false;
         }
+
+        public override string ToString()
+        {
+            return $"src:{SourceStart} dest:{DestinationStart} len:{Length}";
+        }
+    }
+
+    public override string ToString()
+    {
+        var output = new StringBuilder();
+        foreach (var map in maps)
+        {
+            output.AppendLine($"{map.Source} -> {map.Destination}, Ranges = {map.Ranges.Count}");
+        }
+        return output.ToString();
     }
 }
