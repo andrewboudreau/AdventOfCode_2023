@@ -5,17 +5,19 @@ Console.WriteLine(almanac);
 
 var locations = new List<long>();
 
-foreach (var seed in almanac.seeds)
+for(var seed = 1263068588; seed < 1263068588 + 44436703; seed++)
+//foreach (var seed in almanac.seeds)
 {
-    Console.WriteLine("Starting Seed " + seed);
+    //Console.WriteLine("Starting Seed " + seed);
     var dest = almanac.MapToDestination(seed);
     locations.Add(dest);
-    Console.WriteLine($"mapping seed {seed} to location {dest}");
-    Console.WriteLine("");
+    //Console.WriteLine($"mapping seed {seed} to location {dest}");
+    //Console.WriteLine("");
 
-    Console.WriteLine("Min location is " + locations.Min());
+    //Console.WriteLine("Min location is " + locations.Min());
 }
 
+Console.WriteLine("Min location is " + locations.Min());
 class Almanac<TNumber>(TNumber[] seeds)
     where TNumber : struct, INumber<TNumber>
 {
@@ -95,11 +97,12 @@ class Almanac<TNumber>(TNumber[] seeds)
 
         public TNumber MapToDestination(TNumber source)
         {
-            foreach (var range in Ranges)
+            //var range = Ranges.OrderBy(x => x.DestinationStart).First();
+            foreach (var range in Ranges.OrderBy(x => x.DestinationStart))
             {
                 if (range.MapToDestination(source, out var destination))
                 {
-                    Console.WriteLine($"{Source} -> {Destination} ({source},{destination})");
+                    //Console.WriteLine($"{Source} -> {Destination} ({source},{destination})");
                     return destination;
                 }
             }
