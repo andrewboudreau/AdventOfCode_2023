@@ -2,7 +2,7 @@
 
 namespace Day00
 {
-    public static class EnumerableExtensions
+    public static partial class EnumerableExtensions
     {
         public static int ToInt32(this string bits)
             => ToInt32(bits.Select(x => x == '1'));

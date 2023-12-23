@@ -1,23 +1,42 @@
 ﻿// https://adventofcode.com/2023/day/5
 
+
 var almanac = ReadTo(Almanac<long>.Parse);
 Console.WriteLine(almanac);
 
-var locations = new List<long>();
+var locations = new SortedSet<long>();
+long minLocation = long.MaxValue;
 
-for(var seed = 1263068588; seed < 1263068588 + 44436703; seed++)
+//for(var seed = 1263068588; seed < 1263068588 + 44436703; seed++)
 //foreach (var seed in almanac.seeds)
+Parallel.ForEach(EnumerableExtensions.LongRange(2946842531, 102775703), seed =>
 {
     //Console.WriteLine("Starting Seed " + seed);
-    var dest = almanac.MapToDestination(seed);
-    locations.Add(dest);
+    var destination = almanac.MapToDestination(seed);
+    //minLocation = Math.Min(minLocation, destination);
+
+    long currentMin;
+    do
+    {
+        currentMin = minLocation;
+    }
+    while (destination < currentMin &&
+           Interlocked.CompareExchange(ref minLocation, destination, currentMin) != currentMin);
+
     //Console.WriteLine($"mapping seed {seed} to location {dest}");
     //Console.WriteLine("");
 
     //Console.WriteLine("Min location is " + locations.Min());
-}
+    //store the most min location and the seed that got us there
+    //var currentMin = locations.Min();
+    //if (currentMin < minLocation)
+    //{
+    //    minLocation = currentMin;
+    //    Console.WriteLine($"New min location is {minLocation} from seed {seed}");
+    //}
+});
 
-Console.WriteLine("Min location is " + locations.Min());
+Console.WriteLine("Min location is " + minLocation);
 class Almanac<TNumber>(TNumber[] seeds)
     where TNumber : struct, INumber<TNumber>
 {
