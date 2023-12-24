@@ -16,12 +16,12 @@ var hands = ReadTo(lines =>
 
 int rank = 1;
 long total = 0;
-foreach(var hand in hands.Order())
+foreach (var hand in hands.Order())
 {
     total += hand.Bid * rank;
     rank++;
     Console.WriteLine(hand);
-}    
+}
 
 Console.WriteLine(total.ToString());
 
@@ -46,26 +46,80 @@ class Hand : IComparable<Hand>
             rankCounts[card] = ++value;
         }
 
+        rankCounts.TryGetValue('J', out var jokers);
+        rankCounts['J'] = 0;
         var counts = new HashSet<int>(rankCounts.Values);
-        if (counts.Contains(5))
+
+        if (counts.Contains(5) || jokers == 5)
         {
             return WinType.FiveOfKind;
         }
         else if (counts.Contains(4))
         {
+            if (jokers == 1)
+            {
+                return WinType.FiveOfKind;
+            }
             return WinType.FourOfKind;
+        }
+        else if (counts.Contains(3) && counts.Contains(2))
+        {
+            return WinType.FullHouse;
         }
         else if (counts.Contains(3))
         {
-            return counts.Contains(2) ?
-                WinType.FullHouse :
-                WinType.ThreeOfKind;
+            if (jokers == 2)
+            {
+                return WinType.FiveOfKind;
+            }
+            else if (jokers == 1)
+            {
+                return WinType.FourOfKind;
+            }
+            return WinType.ThreeOfKind;
         }
         else if (counts.Contains(2))
         {
-            return rankCounts.Count(kvp => kvp.Value == 2) == 2 ?
-                WinType.TwoPair :
-                WinType.OnePair;
+            if (jokers == 3)
+            {
+                return WinType.FiveOfKind;
+            }
+            else if (jokers == 2)
+            {
+                return WinType.FourOfKind;
+            }
+
+            if (rankCounts.Count(kvp => kvp.Value == 2) == 2)
+            {
+                if (jokers == 1)
+                {
+                    return WinType.FullHouse;
+                }
+                return WinType.TwoPair;
+            }
+
+            if (jokers == 1)
+            {
+                return WinType.ThreeOfKind;
+            }
+
+            return WinType.OnePair;
+        }
+        else if (jokers == 4)
+        {
+            return WinType.FiveOfKind;
+        }
+        else if (jokers == 3)
+        {
+            return WinType.FourOfKind;
+        }
+        else if (jokers == 2)
+        {
+            return WinType.ThreeOfKind;
+        }
+        else if (jokers == 1)
+        {
+            return WinType.OnePair;
         }
 
         return WinType.HighCard;
@@ -84,6 +138,14 @@ class Hand : IComparable<Hand>
                 if (card == otherCards.Current)
                 {
                     continue;
+                }
+                if (card == 'J')
+                {
+                    return -1;
+                }
+                if (otherCards.Current == 'J')
+                {
+                    return 1;
                 }
                 if (char.IsLetter(card) && char.IsDigit(otherCards.Current))
                 {
@@ -118,14 +180,6 @@ class Hand : IComparable<Hand>
                     return 1;
                 }
                 if (otherCards.Current == 'Q')
-                {
-                    return -1;
-                }
-                if (card == 'J')
-                {
-                    return 1;
-                }
-                if (otherCards.Current == 'J')
                 {
                     return -1;
                 }
