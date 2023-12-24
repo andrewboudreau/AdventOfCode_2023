@@ -13,19 +13,29 @@ var races = ReadTo(lines =>
     {
         races.Add(
             new Race(
-                int.Parse(times[i]), 
+                int.Parse(times[i]),
                 int.Parse(distances[i])));
     }
 
     return races;
 });
 
-Console.WriteLine(races);
+var part1 = 1;
+foreach (var race in races)
+{
+    Console.WriteLine("RaceTime: " + race.RaceTime + " Farthest: " + race.DistanceToBeat);
+    foreach (var step in race.TimeSteps)
+    {
+        Console.WriteLine(step);
+    }
+    Console.WriteLine("Best: " + race.Max);
+    Console.WriteLine();
+    Console.WriteLine(part1 *= race.NumberOfWinningChargeTimes);
+}
 
-public class Race
+class Race
 {
     public int RaceTime { get; private set; }
-    public int MaxDistance { get; private set; }
     public List<TimeStep> TimeSteps { get; private set; }
     public int DistanceToBeat { get; }
 
@@ -34,28 +44,22 @@ public class Race
         RaceTime = raceTime;
         DistanceToBeat = distanceToBeat;
         TimeSteps = [];
-    }
 
-    public void AddTimeStep(int time, int speed)
-    {
-        int distance = time * speed;
-        TimeSteps.Add(new TimeStep(time, speed, distance));
-        UpdateMaxDistance();
-    }
-
-    private void UpdateMaxDistance()
-    {
-        MaxDistance = 0;
-        foreach (var step in TimeSteps)
+        for (var i = 1; i < RaceTime; i++)
         {
-            MaxDistance += step.Distance;
+            AddTimeStep(RaceTime - i, i);
         }
     }
 
-    public struct TimeStep(int time, int speed, int distance)
+    private void AddTimeStep(int runTime, int speed)
     {
-        public int Time = time;
-        public int Speed = speed;
-        public int Distance = distance;
+        int distance = runTime * speed;
+        TimeSteps.Add(new TimeStep(runTime, speed, distance, distance > DistanceToBeat));
     }
+
+    public TimeStep Max => TimeSteps.MaxBy(x => x.Distance);
+
+    public int NumberOfWinningChargeTimes => TimeSteps.Count(x => x.Winner);
+
+    public readonly record struct TimeStep(int Time, int Speed, int Distance, bool Winner);
 }
