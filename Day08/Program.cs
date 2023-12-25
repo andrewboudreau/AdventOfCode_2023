@@ -19,22 +19,33 @@ while (input.MoveNext())
     map.Add(parts[0], nodes[0], nodes[1]);
 }
 
-var starts = map.Nodes.Select(x => x.Key).Where(x => x.EndsWith('A')).ToList();
-var currents = [];
-var ends = map.Nodes.Select(x => x.Key).Where(x => x.EndsWith('Z')).ToList();
+var start = map.Nodes.Select(x => x.Key).Where(x => x.EndsWith('A')).ToList();
+var end = map.Nodes.Select(x => x.Key).Where(x => x.EndsWith('Z')).ToHashSet();
 
-foreach (var start in starts.Order())
+var current = start.ToArray();
+
+while (current.Any(x => !end.Contains(x)))
 {
-    Console.WriteLine(start);
+    var direction = path.Next();
+    for (var i = 0; i < start.Count; i++)
+    {
+        if (!end.Contains(current[i]))
+        {
+            current[i] = map.Step(current[i], direction, i);
+        }
+    }
+    if (map.Steps[0] % 10000 == 0)
+    {
+        Console.WriteLine(map.Steps[0]);
+    }
 }
-
-var next = "";
-while ((next = map.Step(current, path.Next())) != finish)
+foreach(var step in map.Steps)
 {
-    Console.WriteLine($"Stepping from {current} to {next} on step {map.Steps[0]} ");
-    current = next;
+    Console.WriteLine(step);
 }
-
+Console.WriteLine(string.Join(", ", map.Steps.Values));
+Console.WriteLine($"Ended at {map.Steps[0]} steps");
+Console.WriteLine(map.Steps.Values.Aggregate((long)1, (acc, x) => acc * x));
 
 //Part1.Solve(map, path);
 
