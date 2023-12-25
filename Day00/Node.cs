@@ -3,12 +3,13 @@
 public class Node<T> : IEqualityComparer<T>, IEquatable<T>
 {
     private readonly List<Node<T>> neighbors;
+
     public Node(T value)
     {
         X = 0;
         Y = 0;
         Value = value;
-        neighbors = new List<Node<T>>();
+        neighbors = [];
     }
 
     public Node(int x, int y, T value)
@@ -16,7 +17,7 @@ public class Node<T> : IEqualityComparer<T>, IEquatable<T>
         X = x;
         Y = y;
         Value = value;
-        neighbors = new List<Node<T>>();
+        neighbors = [];
     }
     public Node((int x, int y, T value) node)
         : this(node.x, node.y, node.value)
