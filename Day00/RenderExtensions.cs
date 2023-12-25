@@ -1,4 +1,6 @@
-﻿namespace Day00
+﻿using System.Collections.Generic;
+
+namespace Day00
 {
     public static class RenderExtensions
     {
@@ -17,7 +19,16 @@
             => Console.WriteLine(renderer(source));
 
         public static void ToConsole<T>(this T source)
-            => ToConsole(source, x => x?.ToString() ?? string.Empty);
+        {
+            if (source is IEnumerable<int> list)
+            {
+                ToConsole(list, x => string.Join(", ", list));
+            }
+            else
+            {
+                ToConsole(source, x => x?.ToString() ?? string.Empty);
+            }
+        }
 
         public static void ToConsole<T>(this T source, string title)
             => ToConsole(source, x => $"{title}\r\n{x?.ToString() ?? string.Empty}\r\n");
