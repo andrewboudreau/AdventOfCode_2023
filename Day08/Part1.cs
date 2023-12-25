@@ -16,11 +16,11 @@ internal class Part1
 
         while ((next = map.Step(current, path.Next())) != finish)
         {
-            Console.WriteLine($"Stepping from {current} to {next} on step {map.Steps} ");
+            Console.WriteLine($"Stepping from {current} to {next} on step {map.Steps[0]} ");
             current = next;
         }
 
-        Console.WriteLine($"Completed from {current} to {finish} on step {map.Steps} ");
+        Console.WriteLine($"Completed from {current} to {finish} on step {map.Steps[0]} ");
 
     }
 }
