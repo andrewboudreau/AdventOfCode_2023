@@ -16,8 +16,13 @@ while (input.MoveNext())
     map.Add(parts[0], nodes[0], nodes[1]);
 }
 
-// Part1.Solve(map, path);
+var starts = map.Nodes.Select(x => x.Key.Reverse().ToList().ToString());
+foreach (var start in starts)
+{
+    Console.WriteLine(start);
+}
 
+// Part1.Solve(map, path);
 
 class Map()
 {
@@ -36,5 +41,4 @@ class Map()
         var destination = direction == 'L' ? Left : Right;
         return destination;
     }
-
 }
