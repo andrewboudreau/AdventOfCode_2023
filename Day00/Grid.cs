@@ -13,7 +13,7 @@ public class Grid<T> : IEnumerable<Node<T>>
     {
     }
 
-    public Grid(IEnumerable<IEnumerable<T>> map)
+    public Grid(IEnumerable<IEnumerable<T>> map, Action<Node<T>>? onCreate = default)
     {
         nodes = new List<Node<T>>();
         int x = 0;
@@ -23,7 +23,9 @@ public class Grid<T> : IEnumerable<Node<T>>
         {
             foreach (var value in row)
             {
-                nodes.Add(new Node<T>(x++, y, value));
+                var node = new Node<T>(x++, y, value);
+                nodes.Add(node);
+                onCreate?.Invoke(node);
             }
 
             if (width == 0)
@@ -122,6 +124,12 @@ public class Grid<T> : IEnumerable<Node<T>>
     public Grid<T> WhileTrue(Func<Grid<T>, bool> operation)
     {
         while (operation(this)) ;
+        return this;
+    }
+
+    public Grid<T> Until(Func<Grid<T>, bool> operation)
+    {
+        while (!operation(this)) ;
         return this;
     }
 

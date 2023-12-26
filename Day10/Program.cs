@@ -1,6 +1,44 @@
 ﻿// https://adventofcode.com/2023/day/10
 
-var foo = Read()
+
+var map = Read(line =>
+{
+    return line
+        .Replace("|", "│")
+        .Replace("-", "─")
+        .Replace("L", "└")
+        .Replace("J", "┘")
+        .Replace("7", "┐")
+        .Replace("F", "┌");
+}).ToArray();
+
+Pipes grid = new(Read()!);
+grid.Each(node =>
+{
+    if (node.Value == 'S')
+    {
+        grid.player = node;
+        node.Visit();
+    }
+});
+
+
+map.ToConsole(row => string.Join(Environment.NewLine, row));
+
+class Pipes : Grid<char>
+{
+    public Node<char> player;
+
+    public Pipes(IEnumerable<IEnumerable<char>> map)
+        : base(map)
+    {
+    }
+
+    //public Node<char> Next()
+    //{
+    //    player.
+    //}
+}
 
 /*
  The pipes are arranged in a two-dimensional grid of tiles:
