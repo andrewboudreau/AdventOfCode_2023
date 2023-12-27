@@ -23,22 +23,54 @@ pipes.Each(node =>
     }
 });
 
+
 while (!ReferenceEquals(pipes.MoveForward(), pipes.start))
 {
-    Console.WriteLine(pipes);
+    Console.Clear();
+    Console.WriteLine(pipes.ToString((pipes.player.X, pipes.player.Y, 20)));
+    Thread.Sleep(50);
 }
+
+Console.WriteLine(pipes.steps);
+Console.WriteLine(pipes.steps / 2);
+
+var crosses = 0;
+var enclosed = 0;
+
+foreach (var row in pipes.Rows())
+{
+    foreach (var node in row)
+    {
+        if (node.IsVisited && Pipes.IsVerticalLoopMarker(node))
+        {
+            crosses++;
+            continue;
+        }
+        else if (!node.IsVisited && crosses > 0 && crosses % 2 != 0)
+        {
+            enclosed++;
+            pipes.MarkAsEnclosed(node);
+        }
+    }
+    crosses = 0;
+}
+
+Console.WriteLine(pipes.ToString((pipes.player.X, pipes.player.Y, 20)));
+Console.WriteLine($"Enclosed: {enclosed}");
 
 class Pipes : Grid<char>
 {
     public Node<char> player;
     public Node<char> start;
-    public int steps = 0;
+    public int steps = 1;
+    public List<Node<char>> enclosed;
 
     public Pipes(IEnumerable<IEnumerable<char>> map)
         : base(map)
     {
         player = default!;
         start = default!;
+        enclosed = [];
     }
 
     public Node<char> MoveForward()
@@ -47,15 +79,15 @@ class Pipes : Grid<char>
         switch (player.Value)
         {
             case '|':
-                if (!(this[player.X, player.Y - 1]?.IsVisited ?? true))
-                {
-                    player = this[player.X, player.Y - 1]
-                        ?? throw new InvalidOperationException($"Attempted to set player to null position at {player.X}, {player.Y - 1}");
-                }
-                else
+                if (!(this[player.X, player.Y + 1]?.IsVisited ?? true))
                 {
                     player = this[player.X, player.Y + 1]
                         ?? throw new InvalidOperationException($"Attempted to set player to null position at {player.X}, {player.Y + 1}");
+                }
+                else
+                {
+                    player = this[player.X, player.Y - 1]
+                        ?? throw new InvalidOperationException($"Attempted to set player to null position at {player.X}, {player.Y - 1}");
                 }
                 break;
             case '-':
@@ -79,7 +111,7 @@ class Pipes : Grid<char>
                 else
                 {
                     player = this[player.X, player.Y - 1]
-                        ?? throw new InvalidOperationException($"Attempted to set player to null position at {player.X + 1}, {player.Y - 1}");
+                        ?? throw new InvalidOperationException($"Attempted to set player to null position at {player.X}, {player.Y - 1}");
                 }
                 break;
             case 'J':
@@ -114,7 +146,7 @@ class Pipes : Grid<char>
                 }
                 else
                 {
-                    player = this[player.X, player.Y - 1]
+                    player = this[player.X, player.Y + 1]
                         ?? throw new InvalidOperationException($"Attempted to set player to null position at {player.X}, {player.Y - 1}");
                 }
                 break;
@@ -124,6 +156,72 @@ class Pipes : Grid<char>
 
         player.Visit();
         return player;
+    }
+
+    public static bool IsLoopMarker(Node<char> node)
+    {
+        var known = new List<char> { '|', '-', 'L', 'J', '7', 'F' };
+        return known.Contains(node.Value);
+    }
+
+    public static bool IsVerticalLoopMarker(Node<char> node)
+    {
+
+        var known = new List<char> { '|', '-', 'L', 'J', '7', 'F' };
+        return known.Contains(node.Value);
+    }
+
+
+    public void MarkAsEnclosed(Node<char> node)
+    {
+        enclosed.Add(node);
+    }
+
+    public string ToString((int X, int Y, int Size) window)
+    {
+        StringBuilder sb = new();
+        bool needsLine = false;
+        Each(node =>
+        {
+            var chr = node.Value;
+            if (node.X > window.X - window.Size && node.X < window.X + window.Size)
+            {
+                if (node.Y > window.Y - window.Size && node.Y < window.Y + window.Size)
+                {
+                    needsLine = true;
+                    if (enclosed.Any(x => ReferenceEquals(x, node)))
+                        sb.Append('I');
+                    else if (chr == '.')
+                        sb.Append(chr);
+                    else if (ReferenceEquals(node, player))
+                        sb.Append('S');
+                    else if (chr == '|')
+                        sb.Append('│');
+                    else if (chr == '-')
+                        sb.Append('─');
+                    else if (chr == 'L')
+                        sb.Append('└');
+                    else if (chr == 'J')
+                        sb.Append('┘');
+                    else if (chr == '7')
+                        sb.Append('┐');
+                    else if (chr == 'F')
+                        sb.Append('┌');
+                    else
+                        sb.Append(chr);
+                }
+            }
+
+            if (node.X == Width - 1 && needsLine == true)
+            {
+                sb.AppendLine();
+                needsLine = false;
+
+            }
+        });
+
+        sb.Append(steps);
+        return sb.ToString();
     }
 
     public override string ToString()

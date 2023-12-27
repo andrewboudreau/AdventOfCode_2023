@@ -279,4 +279,26 @@ public static class GridRenderExtensions
             //draw(string.Join("", row.Select(x => $"({x.X},{x.Y})[{x.Value}]")));
         }
     }
+
+    public static void Render<T>(this Grid<T> grid, (int X, int Y, int Size) window)
+    {
+        bool needsLine = false;
+        grid.Each(node =>
+        {
+            if (node.X > window.X - window.Size && node.X < window.X + window.Size)
+            {
+                if (node.Y > window.Y - window.Size && node.Y < window.Y + window.Size)
+                {
+                    needsLine = true;
+                    Console.Write(node.Value);
+                }
+            }
+
+            if (node.X == grid.Width - 1 && needsLine == true)
+            {
+                Console.WriteLine();
+                needsLine = false;
+            }
+        });
+    }
 }
