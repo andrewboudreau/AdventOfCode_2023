@@ -1,213 +1,80 @@
-﻿// https://adventofcode.com/2023/day/7
+﻿// https://adventofcode.com/2023/day/11
 
-var hands = ReadTo(lines =>
+var expansion = 1_000_000 - 1;
+var map = new Grid<char>(Read()!);
+
+List<int> expandedColumns = [];
+List<int> expandedRows = [];
+
+// Get columns to expand
+foreach (var column in map.Rows().First())
 {
-    var hands = new List<Hand>();
-    foreach (var line in lines)
+    if (column.Value == '.' && map.DownFrom(column).All(x => x == '.'))
     {
-        ArgumentNullException.ThrowIfNull(line);
-
-        var data = line.Split(' ');
-        hands.Add(
-            new Hand(data[0], int.Parse(data[1])));
-    }
-    return hands;
-});
-
-int rank = 1;
-long total = 0;
-foreach (var hand in hands.Order())
-{
-    total += hand.Bid * rank;
-    rank++;
-    Console.WriteLine(hand);
-}
-
-Console.WriteLine(total.ToString());
-
-//Console.WriteLine(hands.First().Type.ToString());
-//Console.WriteLine(hands.Order().First().Type.ToString());
-
-class Hand : IComparable<Hand>
-{
-    public Hand(string cards, int bid)
-    {
-        Bid = bid;
-        Cards = [.. cards];
-        Type = CalculateType();
-    }
-
-    private WinType CalculateType()
-    {
-        Dictionary<char, int> rankCounts = [];
-        foreach (var card in Cards)
-        {
-            rankCounts.TryGetValue(card, out int value);
-            rankCounts[card] = ++value;
-        }
-
-        rankCounts.TryGetValue('J', out var jokers);
-        rankCounts['J'] = 0;
-        var counts = new HashSet<int>(rankCounts.Values);
-
-        if (counts.Contains(5) || jokers == 5)
-        {
-            return WinType.FiveOfKind;
-        }
-        else if (counts.Contains(4))
-        {
-            if (jokers == 1)
-            {
-                return WinType.FiveOfKind;
-            }
-            return WinType.FourOfKind;
-        }
-        else if (counts.Contains(3) && counts.Contains(2))
-        {
-            return WinType.FullHouse;
-        }
-        else if (counts.Contains(3))
-        {
-            if (jokers == 2)
-            {
-                return WinType.FiveOfKind;
-            }
-            else if (jokers == 1)
-            {
-                return WinType.FourOfKind;
-            }
-            return WinType.ThreeOfKind;
-        }
-        else if (counts.Contains(2))
-        {
-            if (jokers == 3)
-            {
-                return WinType.FiveOfKind;
-            }
-            else if (jokers == 2)
-            {
-                return WinType.FourOfKind;
-            }
-
-            if (rankCounts.Count(kvp => kvp.Value == 2) == 2)
-            {
-                if (jokers == 1)
-                {
-                    return WinType.FullHouse;
-                }
-                return WinType.TwoPair;
-            }
-
-            if (jokers == 1)
-            {
-                return WinType.ThreeOfKind;
-            }
-
-            return WinType.OnePair;
-        }
-        else if (jokers == 4)
-        {
-            return WinType.FiveOfKind;
-        }
-        else if (jokers == 3)
-        {
-            return WinType.FourOfKind;
-        }
-        else if (jokers == 2)
-        {
-            return WinType.ThreeOfKind;
-        }
-        else if (jokers == 1)
-        {
-            return WinType.OnePair;
-        }
-
-        return WinType.HighCard;
-    }
-
-    public int CompareTo(Hand? other)
-    {
-        ArgumentNullException.ThrowIfNull(other);
-
-        if (Type == other.Type)
-        {
-            using var otherCards = other.Cards.GetEnumerator();
-            foreach (var card in Cards)
-            {
-                otherCards.MoveNext();
-                if (card == otherCards.Current)
-                {
-                    continue;
-                }
-                if (card == 'J')
-                {
-                    return -1;
-                }
-                if (otherCards.Current == 'J')
-                {
-                    return 1;
-                }
-                if (char.IsLetter(card) && char.IsDigit(otherCards.Current))
-                {
-                    return 1;
-                }
-                if (char.IsDigit(card) && char.IsLetter(otherCards.Current))
-                {
-                    return -1;
-                }
-                if (char.IsDigit(card) && char.IsDigit(otherCards.Current))
-                {
-                    return int.Parse(card.ToString()).CompareTo(int.Parse(otherCards.Current.ToString()));
-                }
-                if (card == 'A')
-                {
-                    return 1;
-                }
-                if (otherCards.Current == 'A')
-                {
-                    return -1;
-                }
-                if (card == 'K')
-                {
-                    return 1;
-                }
-                if (otherCards.Current == 'K')
-                {
-                    return -1;
-                }
-                if (card == 'Q')
-                {
-                    return 1;
-                }
-                if (otherCards.Current == 'Q')
-                {
-                    return -1;
-                }
-            }
-
-            return 0;
-        }
-
-        return Type.CompareTo(other.Type);
-    }
-
-    public int Bid { get; }
-    public List<char> Cards { get; }
-    public WinType Type { get; }
-
-    public override string ToString()
-    {
-        return $"{Type} {string.Join("", Cards)} {Bid}";
+        expandedColumns.Add(column.X);
     }
 }
 
-enum WinType
+// Get rows to expand
+foreach (var row in map.Rows())
 {
-    HighCard = 1,
-    OnePair = 2,
-    TwoPair = 3,
-    ThreeOfKind = 4,
-    FullHouse = 5,
-    FourOfKind = 6,
-    FiveOfKind = 7
+    if (row.All(x => x == '.'))
+    {
+        expandedRows.Add(row.First().Y);
+    }
+}
+
+//map.Render(Console.WriteLine);
+Console.WriteLine($"Expanding Columns {string.Join(", ", expandedColumns)}");
+Console.WriteLine($"Expanding Rows {string.Join(", ", expandedRows)}");
+
+var completed = new HashSet<(Node<char>, Node<char>)>();
+
+foreach (var node in map.Nodes())
+{
+    if (node.Value == '.')
+    {
+        continue;
+    }
+
+    foreach (var otherNode in map.Nodes())
+    {
+        if (otherNode.Value == '.' || ReferenceEquals(node, otherNode))
+        {
+            continue;
+        }
+        if (completed.Contains((node, otherNode)) || completed.Contains((otherNode, node)))
+        {
+            continue;
+        }
+        else
+        {
+            completed.Add((node, otherNode));
+        }
+
+        long distance = map.ManhattanDistance(node, otherNode);
+        distance += (CountCrossedExpansions(expandedRows, node.Y, otherNode.Y) * expansion);
+        distance += (CountCrossedExpansions(expandedColumns, node.X, otherNode.X) * expansion);
+
+        node.SetDistance(node.Distance + distance);
+    }
+}
+
+Console.WriteLine($"Total Distances {map.Nodes().Sum(x => x.Distance)}");
+
+static int CountCrossedExpansions(List<int> rows, int y1, int y2)
+{
+    int count = 0;
+    int minY = Math.Min(y1, y2);
+    int maxY = Math.Max(y1, y2);
+
+    foreach (int row in rows)
+    {
+        if (row > minY && row < maxY)
+        {
+            count++;
+        }
+    }
+
+    return count;
 }

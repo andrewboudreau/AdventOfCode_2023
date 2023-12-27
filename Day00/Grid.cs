@@ -146,6 +146,9 @@ public class Grid<T> : IEnumerable<Node<T>>
         return this;
     }
 
+    public int ManhattanDistance(Node<T> from, Node<T> to)
+        => Math.Abs(from.X - to.X) + Math.Abs(from.Y - to.Y);
+
     public virtual IEnumerable<IEnumerable<Node<T>>> Rows()
     {
         for (var row = 0; row < nodes.Count / width; row++)

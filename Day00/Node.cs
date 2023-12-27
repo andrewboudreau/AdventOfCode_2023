@@ -29,7 +29,7 @@ public class Node<T> : IEqualityComparer<T>, IEquatable<T>
 
     public T Value { get; private set; }
 
-    public int Distance { get; private set; }
+    public long Distance { get; private set; }
 
     public int Visited { get; private set; }
 
@@ -49,7 +49,7 @@ public class Node<T> : IEqualityComparer<T>, IEquatable<T>
         Distance = int.MaxValue;
     }
 
-    public int SetDistance(int distance)
+    public long SetDistance(long distance)
     {
         Visit();
         Distance = distance;
