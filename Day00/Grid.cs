@@ -15,7 +15,7 @@ public class Grid<T> : IEnumerable<Node<T>>
 
     public Grid(IEnumerable<IEnumerable<T>> map, Action<Node<T>>? onCreate = default)
     {
-        nodes = new List<Node<T>>();
+        nodes = [];
         int x = 0;
         int y = 0;
 
