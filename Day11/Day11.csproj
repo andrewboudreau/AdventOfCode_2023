@@ -15,15 +15,6 @@
 		<None Update="problem.txt">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="sample4.txt">
-		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
-		<None Update="sample3.txt">
-		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
-		<None Update="sample2.txt">
-		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
 		<None Update="sample.txt">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>

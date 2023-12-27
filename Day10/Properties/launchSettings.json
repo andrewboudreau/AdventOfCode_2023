@@ -12,6 +12,10 @@
       "commandName": "Project",
       "commandLineArgs": "sample3.txt"
     },
+    "Sample4": {
+      "commandName": "Project",
+      "commandLineArgs": "sample4.txt"
+    },
     "Problem": {
       "commandName": "Project",
       "commandLineArgs": "problem.txt"

@@ -11,7 +11,11 @@ pipes.Each(node =>
 
         pipes.player = node;
         pipes.start = node;
-        if (args.First().Contains("sample"))
+        if (args.First().Contains("sample4"))
+        {
+            node.SetValue('7');
+        }
+        else if (args.First().Contains("sample"))
         {
             node.SetValue('F');
         }
@@ -23,39 +27,81 @@ pipes.Each(node =>
     }
 });
 
+//Console.WriteLine(pipes.ToString((pipes.player.X, pipes.player.Y, 20)));
 
 while (!ReferenceEquals(pipes.MoveForward(), pipes.start))
 {
-    Console.Clear();
-    Console.WriteLine(pipes.ToString((pipes.player.X, pipes.player.Y, 20)));
-    Thread.Sleep(50);
+    //Console.Clear();
+    //Console.WriteLine(pipes.ToString((pipes.player.X, pipes.player.Y, 20)));
+    //Thread.Sleep(1);
 }
 
 Console.WriteLine(pipes.steps);
 Console.WriteLine(pipes.steps / 2);
 
-var crosses = 0;
 var enclosed = 0;
 
-foreach (var row in pipes.Rows())
+// iterate over each row and count the number of vertical lines crossed, even number inside, odd number outside.
+foreach (var row in pipes.Rows().Skip(1).Take(pipes.Height - 2))
 {
+    var crosses = 0;
+    var previous = '-';
+
     foreach (var node in row)
     {
-        if (node.IsVisited && Pipes.IsVerticalLoopMarker(node))
+        var current = node.Value;
+
+        if (node.IsVisited && current == '-')
+        {
+            continue;
+        }
+        else if (node.IsVisited && (current == 'F' || current == '7'))
+        {
+            if (previous == 'J' || previous == 'L')
+            {
+                crosses++;
+                previous = '-';
+            }
+            else if (previous == 'F' || previous == '7')
+            {
+                previous = '-';
+            }
+            else
+            {
+                previous = current;
+            }
+        }
+        else if (node.IsVisited && (current == 'J' || current == 'L'))
+        {
+            if (previous == 'F' || previous == '7')
+            {
+                crosses++;
+                previous = '-';
+            }
+            else if (previous == 'J' || previous == 'L')
+            {
+                previous = '-';
+            }
+            else
+            {
+                previous = current;
+            }
+        }
+        else if (node.IsVisited && current == '|')
         {
             crosses++;
-            continue;
+            previous = '-';
         }
         else if (!node.IsVisited && crosses > 0 && crosses % 2 != 0)
         {
             enclosed++;
             pipes.MarkAsEnclosed(node);
+            previous = '-';
         }
     }
-    crosses = 0;
 }
 
-Console.WriteLine(pipes.ToString((pipes.player.X, pipes.player.Y, 20)));
+Console.WriteLine(pipes.ToString((pipes.player.X, pipes.player.Y, 150)));
 Console.WriteLine($"Enclosed: {enclosed}");
 
 class Pipes : Grid<char>
@@ -158,20 +204,6 @@ class Pipes : Grid<char>
         return player;
     }
 
-    public static bool IsLoopMarker(Node<char> node)
-    {
-        var known = new List<char> { '|', '-', 'L', 'J', '7', 'F' };
-        return known.Contains(node.Value);
-    }
-
-    public static bool IsVerticalLoopMarker(Node<char> node)
-    {
-
-        var known = new List<char> { '|', '-', 'L', 'J', '7', 'F' };
-        return known.Contains(node.Value);
-    }
-
-
     public void MarkAsEnclosed(Node<char> node)
     {
         enclosed.Add(node);
@@ -193,6 +225,8 @@ class Pipes : Grid<char>
                         sb.Append('I');
                     else if (chr == '.')
                         sb.Append(chr);
+                    else if (!node.IsVisited)
+                        sb.Append('0');
                     else if (ReferenceEquals(node, player))
                         sb.Append('S');
                     else if (chr == '|')
@@ -253,7 +287,7 @@ class Pipes : Grid<char>
             }
 
             lineCount++;
-            if (lineCount != Width)
+            if (lineCount != Height)
             {
                 sb.AppendLine();
             }

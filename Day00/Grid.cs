@@ -7,6 +7,7 @@ public class Grid<T> : IEnumerable<Node<T>>
 {
     private readonly List<Node<T>> nodes;
     private readonly int width;
+    private int height;
 
     public Grid(IEnumerable<string> rows, Func<string, IEnumerable<T>> factory)
        : this(rows.Select(factory))
@@ -34,6 +35,7 @@ public class Grid<T> : IEnumerable<Node<T>>
             }
             x = 0;
             y++;
+            height++;
         }
     }
 
@@ -53,6 +55,7 @@ public class Grid<T> : IEnumerable<Node<T>>
     }
 
     public int Width => width;
+    public int Height => height;
 
     public IEnumerable<Node<T>> Neighbors(Node<T> of, bool withDiagonals = true)
     {
