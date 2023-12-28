@@ -7,7 +7,7 @@ public class Grid<T> : IEnumerable<Node<T>>
 {
     private readonly List<Node<T>> nodes;
     private readonly int width;
-    private int height;
+    private readonly int height;
 
     public Grid(IEnumerable<string> rows, Func<string, IEnumerable<T>> factory)
        : this(rows.Select(factory))
@@ -46,7 +46,7 @@ public class Grid<T> : IEnumerable<Node<T>>
             if (x < 0) return default;
             if (x >= width) return default;
             if (y < 0) return default;
-            if (y >= width) return default;
+            if (y >= height) return default;
 
             int offset = y * width + x;
             if (offset < 0 || offset >= nodes.Count) return default;
@@ -176,7 +176,7 @@ public static class GridExtensions
 
     public static IEnumerable<T> DownFrom<T>(this Grid<T> grid, Node<T> node)
     {
-        for (var i = node.Y + 1; i < grid.Width; i++)
+        for (var i = node.Y + 1; i < grid.Height; i++)
         {
             yield return grid[node.X, i]!;
         }
