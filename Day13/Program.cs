@@ -1,49 +1,83 @@
 ﻿// https://adventofcode.com/2023/day/13
 
-
-var sections = ReadRecords(lines =>
-{
-    return new Island(lines);
-});
-
-foreach (var grid in sections)
-{
-    //grid.Render(Console.WriteLine);
-    //Console.WriteLine();
-}
+var sections = ReadRecords<Island>(x => new(x)).ToArray();
 
 var index = 0;
-var horz = 0;
-var vert = 0;
+var checksum = 0;
+
+foreach (var island in sections)
+{
+    index++;
+    var result = island.FindReflectionAxis();
+    if (result.Index == -1)
+    {
+        island.Render(Console.WriteLine);
+        Console.WriteLine();
+        continue;
+    }
+
+    if (result.IsVertical)
+    {
+        //Console.WriteLine($"Section:{index} Vertical Reflection at: {result.Index}");
+        checksum += result.Index;
+        island.OriginalReflection = (result.Index, result.IsVertical);
+    }
+    else
+    {
+        //Console.WriteLine($"Section:{index} Horizontal Reflection at: {result.Index}");
+        checksum += result.Index;
+        island.OriginalReflection = (result.Index, result.IsVertical);
+    }
+}
+
+Console.WriteLine($"Part 1 Sum: {checksum}");
+Console.WriteLine();
+
+// Part 2
+index = 0;
+checksum = 0;
 foreach (var grid in sections)
 {
     index++;
-    var horizontal = grid.FindHorizontalReflection();
-    if (horizontal != -1)
+    var result = grid.FindAlternativeReflectionAxis();
+    if (result.Index == -1)
     {
-        Console.WriteLine($"Section:{index} Horizontal Reflection at: {horizontal}");
-        horz += horizontal * 100;
+        grid.Render(Console.WriteLine);
+        Console.WriteLine();
         continue;
     }
 
-    var vertical = grid.FindVerticalReflection();
-    if (vertical != -1)
+    if (result.IsVertical)
     {
-        Console.WriteLine($"Section:{index} Vertical Reflection at: {vertical}");
-        vert += vertical;
-        continue;
+        Console.WriteLine($"Section:{index} Vertical Reflection at: {result.Index}");
+        checksum += result.Index;
     }
-
-    grid.Render(Console.WriteLine);
-    Console.WriteLine();
+    else
+    {
+        Console.WriteLine($"Section:{index} Horizontal Reflection at: {result.Index}");
+        checksum += result.Index;
+    }
 }
+Console.WriteLine($"Part 2 Sum: {checksum}");
+Console.WriteLine();
 
-Console.Write($"Sum: {vert + horz}");
-
-public class Island : Grid<char>
+class Island : Grid<char>
 {
     public Island(IEnumerable<IEnumerable<char>> map)
         : base(map)
+    {
+        RowHashes = [];
+        ColumnHashes = [];
+        OriginalReflection = (-1, false);
+        ComputeHashes();
+    }
+    public (int Index, bool IsVertical) OriginalReflection;
+
+    public int[] RowHashes { get; private set; }
+
+    public int[] ColumnHashes { get; private set; }
+
+    public void ComputeHashes()
     {
         RowHashes = Rows()
             .Select(row => string.Join("", row.Select(x => x.Value)).GetHashCode())
@@ -57,10 +91,6 @@ public class Island : Grid<char>
 
         ColumnHashes = [.. columnHashBuilder];
     }
-
-    public int[] RowHashes { get; }
-
-    public int[] ColumnHashes { get; }
 
     public int FindHorizontalReflection()
     {
@@ -83,7 +113,7 @@ public class Island : Grid<char>
 
             if (match)
             {
-                return i;
+                return (i * 100);
             }
         }
 
@@ -116,5 +146,43 @@ public class Island : Grid<char>
         }
 
         return -1;
+    }
+
+    public (int Index, bool IsVertical) FindReflectionAxis()
+    {
+        var horizontal = FindHorizontalReflection();
+        if (horizontal != -1)
+        {
+            return (horizontal, false);
+        }
+
+        var vertical = FindVerticalReflection();
+        if (vertical != -1)
+        {
+            return (vertical, true);
+        }
+
+        return (-1, false);
+    }
+
+    public (int Index, bool IsVertical) FindAlternativeReflectionAxis()
+    {
+        foreach (var node in Nodes())
+        {
+            var previous = node.Value;
+            var fix = previous == '.' ? '#' : '.';
+
+            node.SetValue(fix);
+            ComputeHashes();
+            var result = FindReflectionAxis();
+            node.SetValue(previous);
+            if (result.Index != -1 && !(result.IsVertical == OriginalReflection.IsVertical && result.Index == OriginalReflection.Index))
+            {
+                Console.WriteLine($"Swapped ({node.X},{node.Y}) from '{previous}' to '{fix}'.");
+                return result;
+            }
+        }
+
+        return (-1, false);
     }
 }
